@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 import "../components/airbnb/airbnblist.css";
+import { FaHeart, FaRegHeart } from "react-icons/fa"; //uso los mismos iconos de menu
 
 //agreo lo dle punto 5 -GET /api/listings?pageSize=[pageSize]&page=[page]
 const API_URL =
@@ -50,7 +51,6 @@ export default function AirbnbList() {
 
   return (
     <div className="airbnb-container">
-      
       <h1 className="airbnb-title">Airbnb</h1>
 
       <div className="airbnb-grid">
@@ -64,14 +64,19 @@ export default function AirbnbList() {
               />
             )}
 
-            <button onClick={() => toggleFavorite(airbnb._id)}>
-              {favorites.includes(airbnb._id)
-                ? "Quitar favorito"
-                : "Agregar favorito"}
+            <button
+              type="button"
+              className="favorite-button"
+              onClick={() => toggleFavorite(airbnb._id)}
+            >
+              {favorites.includes(airbnb._id) ? (
+                <FaHeart className="favorite-icon favorited" />
+              ) : (
+                <FaRegHeart className="favorite-icon not-favorited" />
+              )}
             </button>
 
             <div className="airbnb-content">
-
               <h2 className="airbnb-name">{airbnb.name}</h2>
 
               <p className="airbnb-summary">{airbnb.summary}</p>
@@ -83,7 +88,6 @@ export default function AirbnbList() {
               >
                 Ver ls publicacion
               </a>
-
             </div>
           </div>
         ))}
