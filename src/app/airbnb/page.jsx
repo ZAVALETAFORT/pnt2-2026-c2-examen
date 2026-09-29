@@ -3,7 +3,10 @@
 import { useEffect, useState } from "react";
 
 import "../components/airbnb/airbnblist.css";
+
 import { FaHeart, FaRegHeart } from "react-icons/fa"; //uso los mismos iconos de menu
+
+import Link from "next/link";
 
 //agreo lo dle punto 5 -GET /api/listings?pageSize=[pageSize]&page=[page]
 const API_URL =
@@ -49,6 +52,10 @@ export default function AirbnbList() {
     localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
   };
 
+  const selectAirbnb = (airbnb) => {
+    localStorage.setItem("selectedAirbnb", JSON.stringify(airbnb));
+  };
+
   return (
     <div className="airbnb-container">
       <h1 className="airbnb-title">Airbnb</h1>
@@ -56,28 +63,40 @@ export default function AirbnbList() {
       <div className="airbnb-grid">
         {airbnbs.map((airbnb) => (
           <div className="airbnb-card" key={airbnb._id}>
-            {airbnb.images?.picture_url && (
-              <img
-                src={airbnb.images.picture_url}
-                alt={airbnb.name}
-                className="airbnb-image"
-              />
-            )}
-
-            <button
-              type="button"
-              className="favorite-button"
-              onClick={() => toggleFavorite(airbnb._id)}
-            >
-              {favorites.includes(airbnb._id) ? (
-                <FaHeart className="favorite-icon favorited" />
-              ) : (
-                <FaRegHeart className="favorite-icon not-favorited" />
+          
+            <div className="airbnb-image-container">
+          
+              {airbnb.images?.picture_url && (
+                <img
+                  src={airbnb.images.picture_url}
+                  alt={airbnb.name}
+                  className="airbnb-image"
+                />
               )}
-            </button>
+
+              <button
+                type="button"
+                className="favorite-button"
+                onClick={() => toggleFavorite(airbnb._id)}
+              >
+                {favorites.includes(airbnb._id) ? (
+                  <FaHeart className="favorite-icon favorited" />
+                ) : (
+                  <FaRegHeart className="favorite-icon not-favorited" />
+                )}
+              </button>
+          
+            </div>
 
             <div className="airbnb-content">
-              <h2 className="airbnb-name">{airbnb.name}</h2>
+              
+              <Link
+                href={`/airbnb/${airbnb._id}`}
+                className="airbnb-name"
+                onClick={() => selectAirbnb(airbnb)}
+              >
+                {airbnb.name}
+              </Link>
 
               <p className="airbnb-summary">{airbnb.summary}</p>
 
@@ -86,7 +105,7 @@ export default function AirbnbList() {
                 target="_blank"
                 className="airbnb-url"
               >
-                Ver ls publicacion
+                Ver la publicacion
               </a>
             </div>
           </div>
