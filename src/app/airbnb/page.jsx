@@ -9,11 +9,19 @@ const API_URL =
   "https://backendairbnb-befph8eegzabfudb.eastus2-01.azurewebsites.net/api/listings?pageSize=100&page=1";
 
 export default function AirbnbList() {
-
   const [airbnbs, setAirbnbs] = useState([]);
+
+  const [favorites, setFavorites] = useState([]);
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
+
+    //agrego favoritos
+    const savedFavorites = JSON.parse(
+      localStorage.getItem("favorites") || "[]",
+    );
+
+    setFavorites(savedFavorites);
 
     fetch(API_URL, {
       headers: {
@@ -22,14 +30,27 @@ export default function AirbnbList() {
     })
       .then((res) => res.json())
       .then((data) => {
-
         setAirbnbs(Array.isArray(data) ? data : data.listings || []);
-
       });
   }, []);
 
+  //funcion para agregar o quitar favoritos
+  const toggleFavorite = (id) => {
+    let updatedFavorites;
+
+    if (favorites.includes(id)) {
+      updatedFavorites = favorites.filter((fav) => fav !== id);
+    } else {
+      updatedFavorites = [...favorites, id];
+    }
+
+    setFavorites(updatedFavorites);
+    localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
+  };
+
   return (
     <div className="airbnb-container">
+      
       <h1 className="airbnb-title">Airbnb</h1>
 
       <div className="airbnb-grid">
@@ -43,7 +64,14 @@ export default function AirbnbList() {
               />
             )}
 
+            <button onClick={() => toggleFavorite(airbnb._id)}>
+              {favorites.includes(airbnb._id)
+                ? "Quitar favorito"
+                : "Agregar favorito"}
+            </button>
+
             <div className="airbnb-content">
+
               <h2 className="airbnb-name">{airbnb.name}</h2>
 
               <p className="airbnb-summary">{airbnb.summary}</p>
@@ -55,6 +83,7 @@ export default function AirbnbList() {
               >
                 Ver ls publicacion
               </a>
+
             </div>
           </div>
         ))}
