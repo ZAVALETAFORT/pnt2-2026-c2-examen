@@ -9,34 +9,44 @@ import { FaHeart, FaRegHeart } from "react-icons/fa"; //uso los mismos iconos de
 import Link from "next/link";
 
 //agreo lo dle punto 5 -GET /api/listings?pageSize=[pageSize]&page=[page]
+//const API_URL = "https://backendairbnb-befph8eegzabfudb.eastus2-01.azurewebsites.net/api/listings?pageSize=100&page=1";
+//ahora uso paginado
 const API_URL =
-  "https://backendairbnb-befph8eegzabfudb.eastus2-01.azurewebsites.net/api/listings?pageSize=100&page=1";
+  "https://backendairbnb-befph8eegzabfudb.eastus2-01.azurewebsites.net/api/listings";
 
 export default function AirbnbList() {
   const [airbnbs, setAirbnbs] = useState([]);
 
+  //favoritos
   const [favorites, setFavorites] = useState([]);
 
-  useEffect(() => {
-    const token = localStorage.getItem("authToken");
+  //paginado
+  const [page, setPage] = useState(1);
 
-    //agrego favoritos
-    const savedFavorites = JSON.parse(
-      localStorage.getItem("favorites") || "[]",
-    );
+  useEffect(
+    () => {
+      const token = localStorage.getItem("authToken");
 
-    setFavorites(savedFavorites);
+      //agrego favoritos
+      const savedFavorites = JSON.parse(
+        localStorage.getItem("favorites") || "[]",
+      );
 
-    fetch(API_URL, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setAirbnbs(Array.isArray(data) ? data : data.listings || []);
-      });
-  }, []);
+      setFavorites(savedFavorites);
+
+      fetch(`${API_URL}?pageSize=100&page=${page}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          setAirbnbs(Array.isArray(data) ? data : data.listings || []);
+        });
+    },
+    //paginado
+    [page],
+  );
 
   //funcion para agregar o quitar favoritos
   const toggleFavorite = (id) => {
@@ -63,9 +73,7 @@ export default function AirbnbList() {
       <div className="airbnb-grid">
         {airbnbs.map((airbnb) => (
           <div className="airbnb-card" key={airbnb._id}>
-          
             <div className="airbnb-image-container">
-          
               {airbnb.images?.picture_url && (
                 <img
                   src={airbnb.images.picture_url}
@@ -85,11 +93,9 @@ export default function AirbnbList() {
                   <FaRegHeart className="favorite-icon not-favorited" />
                 )}
               </button>
-          
             </div>
 
             <div className="airbnb-content">
-              
               <Link
                 href={`/airbnb/${airbnb._id}`}
                 className="airbnb-name"
@@ -111,6 +117,17 @@ export default function AirbnbList() {
           </div>
         ))}
       </div>
+
+      <div>
+        <button disabled={page === 1} onClick={() => setPage(page - 1)}>
+          Anterior
+        </button>
+
+        <span> Página {page} </span>
+
+        <button onClick={() => setPage(page + 1)}>Siguiente</button>
+      </div>
+      
     </div>
   );
 }
