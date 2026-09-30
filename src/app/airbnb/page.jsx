@@ -34,7 +34,10 @@ export default function AirbnbList() {
 
       setFavorites(savedFavorites);
 
-      fetch(`${API_URL}?pageSize=100&page=${page}`, {
+      //test cant de tarjetas por pagina
+      const PAGE_SIZE = 100;
+
+      fetch(`${API_URL}?pageSize=${PAGE_SIZE}&page=${page}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -127,7 +130,6 @@ export default function AirbnbList() {
 
         <button onClick={() => setPage(page + 1)}>Siguiente</button>
       </div>
-      
     </div>
   );
 }
